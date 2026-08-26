@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#111827" />
+  <title>D&L Maintenance Checklist</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <img src="dnl-logo.png" alt="D&L Fluid Hauling Ltd. Logo" class="company-logo">
+    <h1>D&L Fluid Hauling Ltd.</h1>
+    <p>Semi-Truck & Trailer Shop Service Checklist</p>
+  </header>
+
+  <main>
+    <section class="card">
+      <h2>Service Information</h2>
+
+      <label>Equipment Type
+        <select id="equipmentType">
+          <option>Semi-Truck</option>
+          <option>Super B Trailer</option>
+          <option>Tri-Axle Trailer</option>
+          <option>Vac Truck</option>
+          <option>Pressure Truck</option>
+          <option>Other</option>
+        </select>
+      </label>
+
+      <label>Unit #
+        <input id="unitNumber" type="text" />
+      </label>
+
+      <label>Date
+        <input id="serviceDate" type="date" />
+      </label>
+
+      <label>Time
+        <input id="serviceTime" type="time" />
+      </label>
+
+      <label>Odometer (km)
+        <input id="odometer" type="number" inputmode="numeric" />
+      </label>
+
+      <label>Engine Hours
+        <input id="engineHours" type="number" inputmode="decimal" />
+      </label>
+
+      <label>Technician
+        <input id="technician" type="text" />
+      </label>
+    </section>
+
+    <section id="checklist"></section>
+
+    <section class="card">
+      <h2>Defects / Repairs Fixed</h2>
+      <textarea id="repairs" rows="8" placeholder="Enter defects found and repairs completed..."></textarea>
+    </section>
+
+    <section class="card">
+      <h2>Technician Signature</h2>
+      <canvas id="signaturePad" width="800" height="260"></canvas>
+      <div class="button-row">
+        <button id="clearSignature" type="button" class="secondary">Clear Signature</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <label class="confirm-row">
+        <input id="confirmComplete" type="checkbox" />
+        I confirm the service and inspection items above have been completed and defects found have been recorded.
+      </label>
+
+      <div class="button-row">
+        <button id="saveBtn" type="button">Save on Phone</button>
+<button id="completeBtn" type="button">
+  Complete Service
+</button>
+<button id="historyBtn" type="button" class="secondary">
+  View Service History
+</button>       
+ <button id="printBtn" type="button" class="secondary">Print / Save PDF</button>
+        <button id="clearBtn" type="button" class="danger">Clear Form</button>
+      </div>
+<div id="historyPanel" style="display:none; margin-top:20px;">
+  <h2>Service History</h2>
+
+  <input
+    id="historySearch"
+    type="text"
+    placeholder="Search by Unit #"
+  />
+
+  <div id="historyList"></div>
+</div>
+
+      <p id="status"></p>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
