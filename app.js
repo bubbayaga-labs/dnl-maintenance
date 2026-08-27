@@ -142,9 +142,26 @@ function buildChecklist() {
 
     const heading = document.createElement("h2");
     heading.textContent = sectionTitle;
+heading.className = "collapsible-heading";
 
+heading.addEventListener("click", () => {
+  const content = section.querySelector(".section-content");
+
+  if (content.style.display === "none") {
+    content.style.display = "block";
+heading.textContent = "▶ " + sectionTitle;
+  } else {
+    content.style.display = "none";
+    heading.textContent = "▶ " + sectionTitle;
+  }
+});
+
+heading.textContent = "▶ " + sectionTitle;
     section.appendChild(heading);
-
+const sectionContent = document.createElement("div");
+sectionContent.className = "section-content";
+sectionContent.style.display = "none";
+section.appendChild(sectionContent);
     sections[sectionTitle].forEach(item => {
 
       const row = document.createElement("div");
@@ -215,8 +232,7 @@ noteBox.addEventListener("input", () => {
 });
 
 row.appendChild(noteBox);
-      section.appendChild(row);
-    });
+sectionContent.appendChild(row);    });
 
     checklist.appendChild(section);
   });
@@ -534,177 +550,230 @@ const recordNumber = saveToServiceHistory();
 "Service saved. History records: " + recordNumber;
   });
 
-
 document
   .getElementById("printBtn")
-  .addEventListener("click", () => {
+  .addEventListener("click", async () => {
 
     const data = collectData();
 
-    const reportWindow = window.open("", "_blank");
+    const unit = data.unitNumber || "Unknown";
+    const filename =
+      "DNL_Unit_" + unit + "_Service_Report.pdf";
 
-    const statusRows = Object.entries(data.statuses || {})
-      .map(([item, status]) => {
-        const note =
-          data.notes && data.notes[item]
-            ? data.notes[item]
-            : "";
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF();
 
-        return `
-          <tr>
-            <td>${item}</td>
-            <td>${status}</td>
-            <td>${note}</td>
-          </tr>
-        `;
-      })
-      .join("");
+    let y = 20;
 
-    reportWindow.document.write(`
-      <!doctype html>
-      <html>
-      <head>
-        <title>D&L Service Report</title>
-        <style>
-          body {
-            font-family: Arial, sans-serif;
-            padding: 30px;
-            color: #111;
-          }
+    function addLine(text, bold = false) {
+      if (y > 275) {
+        pdf.addPage();
+        y = 20;
+      }
 
-          h1 {
-            text-align: center;
-            margin-bottom: 4px;
-          }
+      pdf.setFont(
+        "helvetica",
+        bold ? "bold" : "normal"
+      );
 
-          h2 {
-            text-align: center;
-            margin-top: 0;
-            font-size: 18px;
-          }
+      const lines =
+        pdf.splitTextToSize(
+          String(text),
+          175
+        );
 
-          .info {
-            margin: 25px 0;
-            line-height: 1.7;
-          }
+      pdf.text(lines, 18, y);
 
-          table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-          }
+      y += lines.length * 7;
+    }
 
-          th,
-          td {
-            border: 1px solid #999;
-            padding: 8px;
-            text-align: left;
-            vertical-align: top;
-          }
+    pdf.setFontSize(18);
+    addLine("D&L Fluid Hauling Ltd.", true);
 
-          th {
-            background: #eee;
-          }
+    pdf.setFontSize(14);
+    addLine("Shop Service Report", true);
 
-          .repairs {
-            margin-top: 25px;
-          }
+    y += 4;
 
-          .signature {
-            margin-top: 35px;
-          }
+    pdf.setFontSize(11);
 
-          .signature img {
-            max-width: 350px;
-            border-bottom: 1px solid #333;
-          }
+    addLine(
+      "Equipment: " +
+      (data.equipmentType || "-")
+    );
 
-          @media print {
-            button {
-              display: none;
-            }
-          }
-        </style>
-      </head>
+    addLine(
+      "Unit #: " +
+      (data.unitNumber || "-")
+    );
 
-      <body>
+    addLine(
+      "Date: " +
+      (data.serviceDate || "-")
+    );
 
-        <h1>D&L Fluid Hauling Ltd.</h1>
-        <h2>Shop Service Report</h2>
+    addLine(
+      "Time: " +
+      (data.serviceTime || "-")
+    );
 
-        <div class="info">
-          <strong>Equipment:</strong>
-          ${data.equipmentType || "-"}
-          <br>
+    addLine(
+      "Odometer: " +
+      (data.odometer || "-") +
+      " km"
+    );
 
-          <strong>Unit #:</strong>
-          ${data.unitNumber || "-"}
-          <br>
+    addLine(
+      "Engine Hours: " +
+      (data.engineHours || "-")
+    );
 
-          <strong>Date:</strong>
-          ${data.serviceDate || "-"}
-          <br>
+    addLine(
+      "Technician: " +
+      (data.technician || "-")
+    );
 
-          <strong>Time:</strong>
-          ${data.serviceTime || "-"}
-          <br>
+    y += 5;
 
-          <strong>Odometer:</strong>
-          ${data.odometer || "-"} km
-          <br>
+    addLine("INSPECTION RESULTS", true);
 
-          <strong>Engine Hours:</strong>
-          ${data.engineHours || "-"}
-          <br>
+    Object.entries(
+      data.statuses || {}
+    ).forEach(([item, status]) => {
 
-          <strong>Technician:</strong>
-          ${data.technician || "-"}
-        </div>
+      addLine(
+        status + " - " + item,
+        true
+      );
 
-        <table>
-          <thead>
-            <tr>
-              <th>Inspection Item</th>
-              <th>Status</th>
-              <th>Defect / Repair Note</th>
-            </tr>
-          </thead>
+      if (
+        data.notes &&
+        data.notes[item]
+      ) {
+        addLine(
+          "Note: " +
+          data.notes[item]
+        );
+      }
 
-          <tbody>
-            ${statusRows}
-          </tbody>
-        </table>
+      y += 2;
+    });
 
-        <div class="repairs">
-          <h3>Additional Defects / Repairs Fixed</h3>
-          <p>
-            ${data.repairs || "None recorded."}
-          </p>
-        </div>
+    if (data.repairs) {
+      y += 4;
 
-        <div class="signature">
-          <h3>Technician Signature</h3>
+      addLine(
+        "DEFECTS / REPAIRS FIXED",
+        true
+      );
 
-          ${
-            data.signature
-              ? `<img src="${data.signature}" alt="Technician Signature">`
-              : "<p>No signature recorded.</p>"
-          }
-        </div>
+      addLine(data.repairs);
+    }
 
-        <br>
+    if (data.signature) {
+      if (y > 220) {
+        pdf.addPage();
+        y = 20;
+      }
 
-        <button onclick="window.print()">
-          Print / Save PDF
-        </button>
+      y += 8;
 
-      </body>
-      </html>
-    `);
+      addLine(
+        "TECHNICIAN SIGNATURE",
+        true
+      );
 
-    reportWindow.document.close();
+      try {
+        pdf.addImage(
+          data.signature,
+          "PNG",
+          18,
+          y,
+          70,
+          25
+        );
+
+        y += 30;
+      } catch (error) {
+        addLine(
+          "Signature could not be added."
+        );
+      }
+    }
+
+    const pdfBlob =
+      pdf.output("blob");
+
+    const pdfFile =
+      new File(
+        [pdfBlob],
+        filename,
+        {
+          type: "application/pdf"
+        }
+      );
+
+    try {
+
+      if (
+        navigator.share &&
+        navigator.canShare &&
+        navigator.canShare({
+          files: [pdfFile]
+        })
+      ) {
+
+        await navigator.share({
+          title:
+            "D&L Service Report - Unit " +
+            unit,
+
+          text:
+            "D&L Fluid Hauling service report for Unit " +
+            unit,
+
+          files: [pdfFile]
+        });
+
+      } else {
+
+        const link =
+          document.createElement("a");
+
+        link.href =
+          URL.createObjectURL(
+            pdfBlob
+          );
+
+        link.download =
+          filename;
+
+        link.click();
+
+        URL.revokeObjectURL(
+          link.href
+        );
+
+        alert(
+          "PDF downloaded. You can attach it to a text or email."
+        );
+      }
+
+    } catch (error) {
+
+      if (
+        error.name !== "AbortError"
+      ) {
+        console.error(error);
+
+        alert(
+          "Could not share the PDF. The report will be downloaded instead."
+        );
+
+        pdf.save(filename);
+      }
+    }
   });
-
 document
   .getElementById("clearBtn")
   .addEventListener("click", () => {
@@ -1053,4 +1122,15 @@ document
     );
 
     location.reload();
+  });
+document
+  .getElementById("historyBtnTop")
+  .addEventListener("click", () => {
+    document.getElementById("historyBtn").click();
+  });
+
+document
+  .getElementById("clearBtnTop")
+  .addEventListener("click", () => {
+    document.getElementById("clearBtn").click();
   });
