@@ -254,3 +254,131 @@ canvas {
   .card { box-shadow: none; border: 1px solid #ddd; break-inside: avoid; }
   button { display: none; }
 }
+
+
+[hidden] { display:none !important; }
+
+.home-grid {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:14px;
+}
+.home-btn {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  min-height:130px;
+  font-size:1.1rem;
+}
+.home-btn small { font-weight:500; opacity:.85; }
+.view-toolbar {
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin-bottom:14px;
+}
+.view-toolbar h2 { margin:0; }
+.job-grid {
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:8px;
+}
+.job-option {
+  display:flex;
+  align-items:center;
+  gap:8px;
+  border:1px solid #cbd5e1;
+  border-radius:10px;
+  padding:10px;
+  margin:0;
+  background:#f8fafc;
+}
+.job-option input {
+  width:22px;
+  height:22px;
+  margin:0;
+}
+.project-card, .driver-history-card {
+  border:1px solid #cbd5e1;
+  border-radius:12px;
+  padding:14px;
+  margin-top:14px;
+  background:#f8fafc;
+}
+.project-actions {
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:10px;
+}
+@media(min-width:700px) {
+  .home-grid { grid-template-columns:repeat(3,1fr); }
+}
+@media(max-width:500px) {
+  .job-grid { grid-template-columns:1fr; }
+}
+
+.company-logo { background:#000; object-fit:contain; }
+
+
+.toggle-row {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  border:1px solid #cbd5e1;
+  border-radius:10px;
+  padding:12px;
+  background:#f8fafc;
+}
+.toggle-row input {
+  width:22px;
+  height:22px;
+  margin:0;
+}
+.two-choice {
+  grid-template-columns:repeat(2,1fr);
+}
+
+.h2s-calibration-choices {
+  grid-template-columns: repeat(3, 1fr) !important;
+}
+
+#projectTireAxleField {
+  margin: 14px 0;
+  padding: 14px;
+  border: 2px solid #2563eb;
+  border-radius: 12px;
+  background: #eff6ff;
+}
+.field-help { display:block; margin-top:6px; color:#475569; }
+
+
+/* Phone keyboard dictation helpers */
+.dictation-hint {
+  margin-top: 6px;
+  font-size: 0.9rem;
+  color: #475569;
+  line-height: 1.35;
+}
+
+textarea {
+  min-height: 110px;
+}
+
+.defect-note {
+  min-height: 120px;
+}
+
+@media (max-width: 500px) {
+  textarea,
+  .defect-note {
+    font-size: 1.05rem;
+    min-height: 130px;
+  }
+
+  .dictation-hint {
+    font-size: 0.95rem;
+  }
+}

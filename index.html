@@ -1,83 +1,158 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="theme-color" content="#111827" />
-  <title>D&L Maintenance Checklist</title>
-  <link rel="manifest" href="manifest.webmanifest" />
-  <link rel="stylesheet" href="styles.css?v=10" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111827">
+  <title>D&L Maintenance</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="styles.css?v=24">
 </head>
 <body>
-  <header>
-    <img
-      src="dnl-logo.png"
-      alt="D&L Fluid Hauling Ltd. Logo"
-      class="company-logo"
-      onerror="this.style.display='none'"
-    />
-    <h1>D&L Fluid Hauling Ltd.</h1>
-    <p>Semi-Truck & Trailer Shop Service Checklist</p>
-  </header>
+<header>
+  <img src="dnl-logo.png" alt="D&L Logo" class="company-logo" onerror="this.style.display='none'">
+  <h1>D&L Fluid Hauling Ltd.</h1>
+  <p>Maintenance & Inspection App</p>
+</header>
 
-  <main>
+<main>
+  <section id="homeView">
+    <section class="card home-card">
+      <h2>Choose an area</h2>
+      <div class="home-grid">
+        <button class="home-btn" id="openDriverBtn">🚛<span>Driver Inspection</span><small>Pre-trip / Post-trip</small></button>
+        <button class="home-btn" id="openMechanicBtn">🔧<span>Mechanic Inspection</span><small>Full shop checklist</small></button>
+        <button class="home-btn" id="openProjectsBtn">📋<span>Work Projects</span><small>Repairs, parts & progress</small></button>
+      </div>
+    </section>
+  </section>
+
+  <section id="driverView" hidden>
+    <div class="view-toolbar"><button class="secondary back-home">← Home</button><h2>Driver Inspection</h2></div>
     <section class="card">
-      <h2>Service Information</h2>
-
+      <label>Inspection Type
+        <select id="driverInspectionType"><option>Pre-Trip</option><option>Post-Trip</option></select>
+      </label>
       <label>Equipment Type
-        <select id="equipmentType">
-          <option>Semi-Truck</option>
-          <option>Super B Trailer</option>
-          <option>Tri-Axle Trailer</option>
-          <option>Vac Truck</option>
-          <option>Pressure Truck</option>
-          <option>Other</option>
+        <select id="driverEquipmentType">
+          <option>Semi-Truck</option><option>Super B Trailer</option><option>Tri-Axle Trailer</option>
+          <option>Vac Truck</option><option>Pressure Truck</option><option>Other</option>
+        </select>
+      </label>
+      <label>Truck Unit #<input id="driverUnitNumber" type="text"></label>
+
+      <label>Truck Fuel Status
+        <select id="driverFuelStatus">
+          <option>Fueled</option>
+          <option>Empty</option>
         </select>
       </label>
 
-      <label>Unit #
-        <input id="unitNumber" type="text" />
+      <label class="toggle-row">
+        <input id="driverHasTrailer" type="checkbox">
+        Trailer Attached
       </label>
 
-      <label>Date
-        <input id="serviceDate" type="date" />
+      <div id="driverTrailerFields" hidden>
+        <label>Trailer Unit #<input id="driverTrailerUnit" type="text"></label>
+        <label>Trailer Type
+          <select id="driverTrailerType">
+            <option>Super B Trailer</option>
+            <option>Tri-Axle Trailer</option>
+            <option>Other Trailer</option>
+          </select>
+        </label>
+      </div>
+      <label>Date<input id="driverDate" type="date"></label>
+      <label>Time<input id="driverTime" type="time"></label>
+      <label>Driver<input id="driverName" type="text"></label>
+    </section>
+    <section id="driverChecklist"></section>
+
+    <section id="driverTrailerChecklistCard" class="card" hidden>
+      <h2 class="collapsible-heading" id="driverTrailerHeading">▼ TRAILER CHECKLIST</h2>
+      <div id="driverTrailerChecklist"></div>
+    </section>
+
+    <section class="card">
+      <h2>H₂S Monitor</h2>
+
+      <label>Monitor ID / Serial #
+        <input id="h2sMonitorId" type="text" placeholder="Optional">
       </label>
 
-      <label>Time
-        <input id="serviceTime" type="time" />
-      </label>
+      <div class="inspection-row">
+        <div class="inspection-name">H₂S Bump Test</div>
+        <div class="inspection-choices two-choice" id="h2sBumpChoices">
+          <label class="status-choice">
+            <input type="radio" name="h2sBump" value="PASS">
+            <span>PASS</span>
+          </label>
+          <label class="status-choice">
+            <input type="radio" name="h2sBump" value="FAIL">
+            <span>FAIL</span>
+          </label>
+        </div>
+      </div>
 
-      <label>Odometer (km)
-        <input id="odometer" type="number" inputmode="numeric" />
-      </label>
+      <div class="inspection-row">
+        <div class="inspection-name">H₂S Calibration</div>
+        <div class="inspection-choices two-choice" id="h2sCalibrationChoices" class="h2s-calibration-choices">
+          <label class="status-choice">
+            <input type="radio" name="h2sCalibration" value="PASS">
+            <span>PASS</span>
+          </label>
+          <label class="status-choice">
+            <input type="radio" name="h2sCalibration" value="FAIL">
+            <span>FAIL</span>
+          </label>
+          <label class="status-choice">
+            <input type="radio" name="h2sCalibration" value="N/A">
+            <span>N/A</span>
+          </label>
+        </div>
+      </div>
+    </section>
+    <section class="card">
+      <h2>Driver Defects / Notes</h2>
+      <textarea id="driverGeneralNotes" rows="6" data-dictation-hint="true"></textarea>
+      <div class="button-row">
+        <button id="saveDriverBtn">Save Inspection</button>
+        <button id="shareDriverBtn" class="secondary">Send PDF to Mechanics</button>
+        <button id="clearDriverBtn" class="danger">Clear</button>
+      </div>
+      <p id="driverStatus"></p>
+    </section>
+  </section>
 
-      <label>Engine Hours
-        <input id="engineHours" type="number" inputmode="decimal" />
+  <section id="mechanicView" hidden>
+    <div class="view-toolbar"><button class="secondary back-home">← Home</button><h2>Mechanic Inspection</h2></div>
+    <section class="card">
+      <h2>Service Information</h2>
+      <label>Equipment Type
+        <select id="equipmentType">
+          <option>Semi-Truck</option><option>Super B Trailer</option><option>Tri-Axle Trailer</option>
+          <option>Vac Truck</option><option>Pressure Truck</option><option>Other</option>
+        </select>
       </label>
-
-      <label>Technician
-        <input id="technician" type="text" />
-      </label>
+      <label>Unit #<input id="unitNumber" type="text"></label>
+      <label>Date<input id="serviceDate" type="date"></label>
+      <label>Time<input id="serviceTime" type="time"></label>
+      <label>Odometer (km)<input id="odometer" type="number"></label>
+      <label>Engine Hours<input id="engineHours" type="number"></label>
+      <label>Technician<input id="technician" type="text"></label>
 
       <div class="button-row top-actions">
-        <button id="historyBtnTop" type="button" class="secondary">
-          View Service History
-        </button>
-        <button id="clearBtnTop" type="button" class="danger">
-          Clear Form
-        </button>
+        <button id="historyBtnTop" class="secondary">View Service History</button>
+        <button id="clearBtnTop" class="danger">Clear Form</button>
       </div>
 
       <div id="historyPanel" class="history-panel" hidden>
         <div class="history-heading-row">
           <h2>Service History</h2>
-          <button id="closeHistoryBtn" type="button" class="secondary small-btn">Close</button>
+          <button id="closeHistoryBtn" class="secondary small-btn">Close</button>
         </div>
-        <input
-          id="historySearch"
-          type="text"
-          placeholder="Search by Unit #"
-        />
+        <input id="historySearch" type="text" placeholder="Search by Unit #">
         <div id="historyList"></div>
       </div>
     </section>
@@ -86,40 +161,73 @@
 
     <section class="card">
       <h2>Defects / Repairs Fixed</h2>
-      <textarea
-        id="repairs"
-        rows="8"
-        placeholder="Enter defects found and repairs completed..."
-      ></textarea>
+      <textarea id="repairs" rows="8" data-dictation-hint="true"></textarea>
     </section>
 
     <section class="card">
       <h2>Technician Signature</h2>
       <canvas id="signaturePad" width="800" height="260"></canvas>
-      <div class="button-row">
-        <button id="clearSignature" type="button" class="secondary">
-          Clear Signature
-        </button>
-      </div>
+      <div class="button-row"><button id="clearSignature" class="secondary">Clear Signature</button></div>
     </section>
 
     <section class="card">
-      <label class="confirm-row">
-        <input id="confirmComplete" type="checkbox" />
+      <label class="confirm-row"><input id="confirmComplete" type="checkbox">
         I confirm the service and inspection items above have been completed and defects found have been recorded.
       </label>
-
       <div class="button-row">
-        <button id="saveBtn" type="button">Save on Phone</button>
-        <button id="completeBtn" type="button">Complete Service</button>
-        <button id="printBtn" type="button" class="secondary">Share / Save PDF</button>
+        <button id="saveBtn">Save on Phone</button>
+        <button id="completeBtn">Complete Service</button>
+        <button id="printBtn" class="secondary">Share / Save PDF</button>
       </div>
-
       <p id="status"></p>
     </section>
-  </main>
+  </section>
 
-  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
-  <script src="app.js?v=10"></script>
+  <section id="projectsView" hidden>
+    <div class="view-toolbar"><button class="secondary back-home">← Home</button><h2>Work Projects</h2></div>
+    <section class="card">
+      <h2>Create / Edit Project</h2>
+      <input id="projectId" type="hidden">
+      <label>Unit #<input id="projectUnit" type="text"></label>
+      <label>Equipment Type
+        <select id="projectEquipment">
+          <option>Semi-Truck</option><option>Super B Trailer</option><option>Tri-Axle Trailer</option>
+          <option>Vac Truck</option><option>Pressure Truck</option><option>Other</option>
+        </select>
+      </label>
+      <label>Assigned Mechanic<input id="projectMechanic" type="text"></label>
+      <label>Date Started<input id="projectDateStarted" type="date"></label>
+      <label>Priority<select id="projectPriority"><option>Normal</option><option>High</option><option>Urgent</option></select></label>
+      <label>Status<select id="projectStatus"><option>Needs Repair</option><option>Waiting on Parts</option><option>In Progress</option><option>Completed</option></select></label>
+      <h3>Work Required</h3>
+      <div id="projectJobs" class="job-grid"></div>
+      <label>Other Repair<input id="projectOtherRepair" type="text"></label>
+      <div id="projectTireAxleField" hidden>
+        <label><strong>Tire / Axle Worked On</strong>
+          <textarea id="projectTireAxle" rows="3" placeholder="Example: Drive axle 2 — passenger side outer tire"></textarea>
+        </label>
+        <small class="field-help">Only shown for tire, brake, hub, S-cam, brake pot, brake air line, or air bag work.</small>
+      </div>
+      <label>Parts Needed<textarea id="projectParts" rows="4" data-dictation-hint="true"></textarea></label>
+      <label>Work Notes<textarea id="projectNotes" rows="5" data-dictation-hint="true"></textarea></label>
+      <label>Completion Date<input id="projectCompletedDate" type="date"></label>
+      <div class="button-row">
+        <button id="saveProjectBtn">Save Project</button>
+        <button id="shareProjectBtn" class="secondary">Send Completed Work</button>
+        <button id="newProjectBtn" class="secondary">New Project</button>
+      </div>
+      <p id="projectFormStatus"></p>
+    </section>
+
+    <section class="card">
+      <h2>Open Projects</h2>
+      <input id="projectSearch" type="text" placeholder="Search by Unit #, mechanic, status, or repair">
+      <div id="projectList"></div>
+    </section>
+  </section>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
+<script src="app.js?v=24"></script>
 </body>
 </html>

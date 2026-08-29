@@ -1,43 +1,35 @@
-const CACHE_NAME = "dnl-maintenance-v10";
-const CORE_ASSETS = [
+const CACHE_NAME = "dnl-maintenance-v24";
+const CORE = [
   "./",
   "./index.html",
-  "./styles.css?v=10",
-  "./app.js?v=10",
+  "./styles.css?v=24",
+  "./app.js?v=24",
   "./manifest.webmanifest",
+  "./dnl-logo.png",
   "./icon-192.svg",
   "./icon-512.svg"
 ];
 
 self.addEventListener("install", event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(CORE_ASSETS))
-  );
+  event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(CORE)));
   self.skipWaiting();
 });
 
 self.addEventListener("activate", event => {
   event.waitUntil(
     caches.keys()
-      .then(keys => Promise.all(
-        keys
-          .filter(key => key !== CACHE_NAME)
-          .map(key => caches.delete(key))
-      ))
+      .then(keys => Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))))
       .then(() => self.clients.claim())
   );
 });
 
 self.addEventListener("fetch", event => {
   if (event.request.method !== "GET") return;
-
   const url = new URL(event.request.url);
-
   if (url.origin !== self.location.origin) {
     event.respondWith(fetch(event.request));
     return;
   }
-
   event.respondWith(
     fetch(event.request)
       .then(response => {
@@ -45,10 +37,6 @@ self.addEventListener("fetch", event => {
         caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
         return response;
       })
-      .catch(() =>
-        caches.match(event.request).then(cached =>
-          cached || caches.match("./index.html")
-        )
-      )
+      .catch(() => caches.match(event.request).then(cached => cached || caches.match("./index.html")))
   );
 });

@@ -1,4 +1,710 @@
-const APP_VERSION = "10";
+const views = {
+  home: document.getElementById("homeView"),
+  driver: document.getElementById("driverView"),
+  mechanic: document.getElementById("mechanicView"),
+  projects: document.getElementById("projectsView")
+};
+
+function showView(name) {
+  Object.entries(views).forEach(([key, el]) => el.hidden = key !== name);
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+
+document.getElementById("openDriverBtn").addEventListener("click", () => showView("driver"));
+document.getElementById("openMechanicBtn").addEventListener("click", () => showView("mechanic"));
+document.getElementById("openProjectsBtn").addEventListener("click", () => showView("projects"));
+document.querySelectorAll(".back-home").forEach(btn => btn.addEventListener("click", () => showView("home")));
+
+const driverItems = [
+  "Lights and reflectors",
+  "Tires, wheels and lug nuts",
+  "Visible fluid leaks",
+  "Mirrors, windshield and wipers",
+  "Horn",
+  "Steering and obvious looseness",
+  "Air pressure / warning system",
+  "Brake operation",
+  "Air lines and couplers",
+  "Suspension and air bags",
+  "Fifth wheel / coupling",
+  "Mud flaps",
+  "Gauges and warning lights",
+  "Emergency / safety equipment",
+  "Obvious body or equipment damage",
+  "Positive air shutdown test"
+];
+
+
+const driverTrailerItems = [
+  "Trailer lights and reflectors",
+  "Trailer tires, wheels and lug nuts",
+  "Trailer brake operation",
+  "Trailer air lines and glad hands",
+  "Trailer suspension and air bags",
+  "Trailer coupling / pintle / fifth wheel connection",
+  "Trailer frame and obvious damage",
+  "Trailer hub oil / hub condition",
+  "Trailer mud flaps"
+];
+
+let trailerSelections = {};
+let trailerNotes = {};
+
+let driverSelections = {};
+let driverNotes = {};
+const driverChecklist = document.getElementById("driverChecklist");
+
+function buildDriverChecklist() {
+  driverChecklist.innerHTML = "";
+  const section = document.createElement("section");
+  section.className = "card";
+  const heading = document.createElement("h2");
+  heading.className = "collapsible-heading";
+  heading.textContent = "▼ DRIVER CHECKLIST";
+  const content = document.createElement("div");
+  content.className = "section-content";
+  heading.addEventListener("click", () => {
+    content.hidden = !content.hidden;
+    heading.textContent = (content.hidden ? "▶ " : "▼ ") + "DRIVER CHECKLIST";
+  });
+  section.appendChild(heading);
+  section.appendChild(content);
+
+  driverItems.forEach(item => {
+    const row = document.createElement("div");
+    row.className = "inspection-row";
+    const title = document.createElement("div");
+    title.className = "inspection-name";
+    title.textContent = item;
+    row.appendChild(title);
+
+    const choices = document.createElement("div");
+    choices.className = "inspection-choices";
+
+    const note = document.createElement("textarea");
+    note.className = "defect-note";
+    note.placeholder = item === "Tires, wheels and lug nuts" ? "Tire / axle defect location (example: Drive axle 1 — passenger inner tire)" : "Describe defect...";
+    note.value = driverNotes[item] || "";
+    note.hidden = driverSelections[item] !== "FAIL";
+
+    ["PASS","FAIL","N/A"].forEach(state => {
+      const label = document.createElement("label");
+      label.className = "status-choice";
+      const radio = document.createElement("input");
+      radio.type = "radio";
+      radio.name = "driver_" + item;
+      radio.value = state;
+      radio.checked = driverSelections[item] === state;
+      radio.addEventListener("change", () => {
+        driverSelections[item] = state;
+        note.hidden = state !== "FAIL";
+        if (!note.hidden) {
+          setTimeout(() => {
+            note.focus();
+            note.scrollIntoView({ behavior: "smooth", block: "center" });
+          }, 50);
+        }
+      });
+      const span = document.createElement("span");
+      span.textContent = state;
+      label.appendChild(radio);
+      label.appendChild(span);
+      choices.appendChild(label);
+    });
+
+    note.addEventListener("input", () => driverNotes[item] = note.value);
+    row.appendChild(choices);
+    row.appendChild(note);
+    content.appendChild(row);
+  });
+  driverChecklist.appendChild(section);
+}
+
+
+const driverHasTrailer = document.getElementById("driverHasTrailer");
+const driverTrailerFields = document.getElementById("driverTrailerFields");
+const driverTrailerChecklistCard = document.getElementById("driverTrailerChecklistCard");
+const driverTrailerChecklist = document.getElementById("driverTrailerChecklist");
+const driverTrailerHeading = document.getElementById("driverTrailerHeading");
+
+function selectedRadio(name) {
+  return document.querySelector(`input[name="${name}"]:checked`)?.value || "";
+}
+
+function buildDriverTrailerChecklist() {
+  driverTrailerChecklist.innerHTML = "";
+
+  driverTrailerItems.forEach(item => {
+    const row = document.createElement("div");
+    row.className = "inspection-row";
+
+    const title = document.createElement("div");
+    title.className = "inspection-name";
+    title.textContent = item;
+    row.appendChild(title);
+
+    const choices = document.createElement("div");
+    choices.className = "inspection-choices driver-choices";
+
+    const note = document.createElement("textarea");
+    note.className = "defect-note";
+    note.placeholder = item === "Trailer tires, wheels and lug nuts" ? "Tire / axle defect location (example: Trailer axle 2 — driver outer tire)" : "Describe trailer defect...";
+    note.value = trailerNotes[item] || "";
+    note.hidden = trailerSelections[item] !== "FAIL";
+
+    ["PASS","FAIL","N/A"].forEach(state => {
+      const label = document.createElement("label");
+      label.className = "status-choice";
+
+      const radio = document.createElement("input");
+      radio.type = "radio";
+      radio.name = "trailer_" + item;
+      radio.value = state;
+      radio.checked = trailerSelections[item] === state;
+      radio.addEventListener("change", () => {
+        trailerSelections[item] = state;
+        note.hidden = state !== "FAIL";
+        if (!note.hidden) {
+          setTimeout(() => {
+            note.focus();
+            note.scrollIntoView({ behavior: "smooth", block: "center" });
+          }, 50);
+        }
+      });
+
+      const span = document.createElement("span");
+      span.textContent = state;
+
+      label.appendChild(radio);
+      label.appendChild(span);
+      choices.appendChild(label);
+    });
+
+    note.addEventListener("input", () => trailerNotes[item] = note.value);
+
+    row.appendChild(choices);
+    row.appendChild(note);
+    driverTrailerChecklist.appendChild(row);
+  });
+}
+
+function syncTrailerVisibility() {
+  const show = driverHasTrailer.checked;
+  driverTrailerFields.hidden = !show;
+  driverTrailerChecklistCard.hidden = !show;
+}
+
+driverHasTrailer.addEventListener("change", syncTrailerVisibility);
+
+driverTrailerHeading.addEventListener("click", () => {
+  driverTrailerChecklist.hidden = !driverTrailerChecklist.hidden;
+  driverTrailerHeading.textContent =
+    (driverTrailerChecklist.hidden ? "▶ " : "▼ ") + "TRAILER CHECKLIST";
+});
+
+buildDriverTrailerChecklist();
+syncTrailerVisibility();
+
+function getDriverHistory() {
+  try { return JSON.parse(localStorage.getItem("dnlDriverHistory") || "[]"); }
+  catch { return []; }
+}
+function setDriverHistory(h) {
+  localStorage.setItem("dnlDriverHistory", JSON.stringify(h));
+}
+
+document.getElementById("saveDriverBtn").addEventListener("click", () => {
+  const unit = document.getElementById("driverUnitNumber").value.trim();
+  const driver = document.getElementById("driverName").value.trim();
+  if (!unit || !driver) {
+    alert("Please enter Unit # and Driver.");
+    return;
+  }
+  const h = getDriverHistory();
+  h.push({
+    type: document.getElementById("driverInspectionType").value,
+    equipment: document.getElementById("driverEquipmentType").value,
+    unit,
+    fuelStatus: document.getElementById("driverFuelStatus").value,
+    hasTrailer: document.getElementById("driverHasTrailer").checked,
+    trailerUnit: document.getElementById("driverTrailerUnit").value.trim(),
+    trailerType: document.getElementById("driverTrailerType").value,
+    trailerSelections: {...trailerSelections},
+    trailerNotes: {...trailerNotes},
+    h2sMonitorId: document.getElementById("h2sMonitorId").value.trim(),
+    h2sBump: selectedRadio("h2sBump"),
+    h2sCalibration: selectedRadio("h2sCalibration"),
+    date: document.getElementById("driverDate").value,
+    time: document.getElementById("driverTime").value,
+    driver,
+    selections: {...driverSelections},
+    notes: {...driverNotes},
+    generalNotes: document.getElementById("driverGeneralNotes").value,
+    savedAt: new Date().toISOString()
+  });
+  setDriverHistory(h);
+  document.getElementById("driverStatus").textContent = "Driver inspection saved.";
+  driverSelections = {};
+  driverNotes = {};
+  buildDriverChecklist();
+});
+
+document.getElementById("clearDriverBtn").addEventListener("click", () => {
+  if (!confirm("Clear the current driver inspection?")) return;
+  driverSelections = {};
+  driverNotes = {};
+  trailerSelections = {};
+  trailerNotes = {};
+  document.getElementById("driverUnitNumber").value = "";
+  document.getElementById("driverFuelStatus").value = "Fueled";
+  document.getElementById("driverHasTrailer").checked = false;
+  document.getElementById("driverTrailerUnit").value = "";
+  document.getElementById("h2sMonitorId").value = "";
+  document.querySelectorAll('input[name="h2sBump"], input[name="h2sCalibration"]').forEach(r => r.checked = false);
+  syncTrailerVisibility();
+  buildDriverTrailerChecklist();
+  document.getElementById("driverName").value = "";
+  document.getElementById("driverGeneralNotes").value = "";
+  buildDriverChecklist();
+});
+
+
+function currentDriverData() {
+  return {
+    type: document.getElementById("driverInspectionType").value,
+    equipment: document.getElementById("driverEquipmentType").value,
+    unit: document.getElementById("driverUnitNumber").value.trim(),
+    fuelStatus: document.getElementById("driverFuelStatus").value,
+    hasTrailer: document.getElementById("driverHasTrailer").checked,
+    trailerUnit: document.getElementById("driverTrailerUnit").value.trim(),
+    trailerType: document.getElementById("driverTrailerType").value,
+    trailerSelections: {...trailerSelections},
+    trailerNotes: {...trailerNotes},
+    h2sMonitorId: document.getElementById("h2sMonitorId").value.trim(),
+    h2sBump: selectedRadio("h2sBump"),
+    h2sCalibration: selectedRadio("h2sCalibration"),
+    date: document.getElementById("driverDate").value,
+    time: document.getElementById("driverTime").value,
+    driver: document.getElementById("driverName").value.trim(),
+    selections: {...driverSelections},
+    notes: {...driverNotes},
+    generalNotes: document.getElementById("driverGeneralNotes").value
+  };
+}
+
+async function makeDriverPdf(data) {
+  if (!window.jspdf?.jsPDF) throw new Error("PDF library did not load.");
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF();
+  let y = 18;
+
+  // New D&L logo
+  try {
+    const img = await fetch("dnl-logo.png").then(r => r.blob()).then(blob => new Promise(resolve => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.readAsDataURL(blob);
+    }));
+    pdf.addImage(img, "PNG", 18, y, 174, 62);
+    y += 68;
+  } catch {}
+
+  pdf.setFontSize(16);
+  pdf.setFont("helvetica","bold");
+  pdf.text(`Driver ${data.type || "Inspection"} Report`, 18, y);
+  y += 9;
+  pdf.setFontSize(11);
+  pdf.setFont("helvetica","normal");
+
+  const lines = [
+    `Equipment: ${data.equipment || "-"}`,
+    `Truck Unit #: ${data.unit || "-"}`,
+    `Truck Fuel Status: ${data.fuelStatus || "-"}`,
+    `Trailer Attached: ${data.hasTrailer ? "Yes" : "No"}`,
+    ...(data.hasTrailer ? [
+      `Trailer Unit #: ${data.trailerUnit || "-"}`,
+      `Trailer Type: ${data.trailerType || "-"}`
+    ] : []),
+    `H2S Monitor ID: ${data.h2sMonitorId || "-"}`,
+    `H2S Bump Test: ${data.h2sBump || "NOT MARKED"}`,
+    `H2S Calibration: ${data.h2sCalibration || "NOT MARKED"}`,
+    `Date: ${data.date || "-"}`,
+    `Time: ${data.time || "-"}`,
+    `Driver: ${data.driver || "-"}`
+  ];
+  lines.forEach(t => { pdf.text(t,18,y); y += 6; });
+  y += 3;
+
+  pdf.setFont("helvetica","bold");
+  pdf.text("INSPECTION",18,y); y += 7;
+  pdf.setFont("helvetica","normal");
+
+  driverItems.forEach(item => {
+    if (y > 275) { pdf.addPage(); y = 20; }
+    const state = data.selections?.[item] || "NOT MARKED";
+    const wrapped = pdf.splitTextToSize(`${state} - ${item}`, 174);
+    pdf.text(wrapped,18,y);
+    y += wrapped.length * 5.5;
+    if (data.notes?.[item]) {
+      const note = pdf.splitTextToSize(`Defect: ${data.notes[item]}`, 168);
+      pdf.text(note,24,y);
+      y += note.length * 5.5;
+    }
+  });
+
+
+  if (data.hasTrailer) {
+    if (y > 245) { pdf.addPage(); y = 20; }
+    y += 4;
+    pdf.setFont("helvetica","bold");
+    pdf.text("TRAILER INSPECTION",18,y); y += 7;
+    pdf.setFont("helvetica","normal");
+
+    driverTrailerItems.forEach(item => {
+      if (y > 275) { pdf.addPage(); y = 20; }
+      const state = data.trailerSelections?.[item] || "NOT MARKED";
+      const wrapped = pdf.splitTextToSize(`${state} - ${item}`, 174);
+      pdf.text(wrapped,18,y);
+      y += wrapped.length * 5.5;
+      if (data.trailerNotes?.[item]) {
+        const note = pdf.splitTextToSize(`Defect: ${data.trailerNotes[item]}`, 168);
+        pdf.text(note,24,y);
+        y += note.length * 5.5;
+      }
+    });
+  }
+
+  if (data.generalNotes) {
+    if (y > 250) { pdf.addPage(); y = 20; }
+    y += 4;
+    pdf.setFont("helvetica","bold");
+    pdf.text("DRIVER NOTES",18,y); y += 7;
+    pdf.setFont("helvetica","normal");
+    const note = pdf.splitTextToSize(data.generalNotes,174);
+    pdf.text(note,18,y);
+  }
+
+  const filename = `DNL_Driver_${(data.type||"Inspection").replace(/\s+/g,"_")}_Unit_${data.unit||"Unknown"}_${data.date||"NoDate"}.pdf`;
+  return new File([pdf.output("blob")], filename, {type:"application/pdf"});
+}
+
+async function sharePdfFile(file, title, text) {
+  if (navigator.share && navigator.canShare && navigator.canShare({files:[file]})) {
+    await navigator.share({title, text, files:[file]});
+  } else {
+    const url = URL.createObjectURL(file);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = file.name;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+}
+
+document.getElementById("shareDriverBtn").addEventListener("click", async () => {
+  try {
+    const data = currentDriverData();
+    if (!data.unit || !data.driver) {
+      alert("Please enter Truck Unit # and Driver before sending the PDF.");
+      return;
+    }
+    if (data.hasTrailer && !data.trailerUnit) {
+      alert("Please enter the Trailer Unit #.");
+      return;
+    }
+    if (!data.h2sBump || !data.h2sCalibration) {
+      alert("Please mark both the H2S bump test and calibration PASS or FAIL.");
+      return;
+    }
+    const file = await makeDriverPdf(data);
+    await sharePdfFile(
+      file,
+      `D&L Driver ${data.type} - Unit ${data.unit}`,
+      `Driver ${data.type} report for Unit ${data.unit}. Please review the attached PDF.`
+    );
+    document.getElementById("driverStatus").textContent = "Driver PDF ready to send to mechanics.";
+  } catch (e) {
+    if (e?.name !== "AbortError") alert(e?.message || "Could not create driver PDF.");
+  }
+});
+
+const projectJobTypes = [
+  "Oil Change","Fuel Filter","Brakes","Tires","Lights","Hub Bearings",
+  "S-Cams","S-Cam Tubes","Brake Pots","Brake Air Lines","Air Bags"
+];
+
+const projectJobs = document.getElementById("projectJobs");
+const projectTireAxleField = document.getElementById("projectTireAxleField");
+const axleRelatedJobs = new Set(["Brakes","Tires","Hub Bearings","S-Cams","S-Cam Tubes","Brake Pots","Brake Air Lines","Air Bags"]);
+
+function syncProjectTireAxleVisibility() {
+  const show = selectedProjectJobs().some(job => axleRelatedJobs.has(job));
+  projectTireAxleField.hidden = !show;
+  if (!show) document.getElementById("projectTireAxle").value = "";
+}
+
+function buildProjectJobOptions(selected=[]) {
+  projectJobs.innerHTML = "";
+  projectJobTypes.forEach(job => {
+    const label = document.createElement("label");
+    label.className = "job-option";
+    const cb = document.createElement("input");
+    cb.type = "checkbox";
+    cb.value = job;
+    cb.checked = selected.includes(job);
+    cb.addEventListener("change", syncProjectTireAxleVisibility);
+    const span = document.createElement("span");
+    span.textContent = job;
+    label.appendChild(cb);
+    label.appendChild(span);
+    projectJobs.appendChild(label);
+  });
+  syncProjectTireAxleVisibility();
+}
+
+function selectedProjectJobs() {
+  return [...projectJobs.querySelectorAll('input[type="checkbox"]:checked')].map(x => x.value);
+}
+
+function getProjects() {
+  try { return JSON.parse(localStorage.getItem("dnlWorkProjects") || "[]"); }
+  catch { return []; }
+}
+function setProjects(p) {
+  localStorage.setItem("dnlWorkProjects", JSON.stringify(p));
+}
+
+function clearProjectForm() {
+  document.getElementById("projectId").value = "";
+  document.getElementById("projectUnit").value = "";
+  document.getElementById("projectMechanic").value = "";
+  document.getElementById("projectPriority").value = "Normal";
+  document.getElementById("projectStatus").value = "Needs Repair";
+  document.getElementById("projectOtherRepair").value = "";
+  document.getElementById("projectTireAxle").value = "";
+  document.getElementById("projectParts").value = "";
+  document.getElementById("projectNotes").value = "";
+  document.getElementById("projectCompletedDate").value = "";
+  buildProjectJobOptions([]);
+}
+
+function renderProjects(search="") {
+  const list = document.getElementById("projectList");
+  const q = search.toLowerCase().trim();
+  const projects = getProjects();
+  list.innerHTML = "";
+
+  projects
+    .map((record,index)=>({record,index}))
+    .filter(({record}) => [
+      record.unit, record.mechanic, record.status, ...(record.jobs||[]),
+      record.otherRepair, record.tireAxle, record.parts
+    ].join(" ").toLowerCase().includes(q))
+    .forEach(({record,index}) => {
+      const card = document.createElement("div");
+      card.className = "project-card";
+      const title = document.createElement("h3");
+      title.textContent = `Unit ${record.unit} — ${record.status}`;
+      card.appendChild(title);
+      const p = document.createElement("p");
+      const jobs = [...(record.jobs||[])];
+      if (record.otherRepair) jobs.push(record.otherRepair);
+      p.textContent = `Work: ${jobs.join(", ") || "Not specified"} • Mechanic: ${record.mechanic || "-"}`;
+      card.appendChild(p);
+
+      if (record.tireAxle) {
+        const loc = document.createElement("p");
+        loc.textContent = "Tire / Axle: " + record.tireAxle;
+        card.appendChild(loc);
+      }
+
+      if (record.parts) {
+        const parts = document.createElement("p");
+        parts.textContent = "Parts Needed: " + record.parts;
+        card.appendChild(parts);
+      }
+
+      const actions = document.createElement("div");
+      actions.className = "project-actions";
+
+      const edit = document.createElement("button");
+      edit.className = "secondary";
+      edit.textContent = "Open / Edit";
+      edit.addEventListener("click", () => {
+        document.getElementById("projectId").value = record.id;
+        document.getElementById("projectUnit").value = record.unit || "";
+        document.getElementById("projectEquipment").value = record.equipment || "Semi-Truck";
+        document.getElementById("projectMechanic").value = record.mechanic || "";
+        document.getElementById("projectDateStarted").value = record.dateStarted || "";
+        document.getElementById("projectPriority").value = record.priority || "Normal";
+        document.getElementById("projectStatus").value = record.status || "Needs Repair";
+        document.getElementById("projectOtherRepair").value = record.otherRepair || "";
+        document.getElementById("projectTireAxle").value = record.tireAxle || "";
+        document.getElementById("projectParts").value = record.parts || "";
+        document.getElementById("projectNotes").value = record.notes || "";
+        document.getElementById("projectCompletedDate").value = record.completedDate || "";
+        buildProjectJobOptions(record.jobs || []);
+        window.scrollTo({top:0,behavior:"smooth"});
+      });
+
+      const del = document.createElement("button");
+      del.className = "danger";
+      del.textContent = "Delete";
+      del.addEventListener("click", () => {
+        if (!confirm("Delete this work project?")) return;
+        const next = getProjects();
+        next.splice(index,1);
+        setProjects(next);
+        renderProjects(document.getElementById("projectSearch").value);
+      });
+
+      actions.appendChild(edit);
+      actions.appendChild(del);
+      card.appendChild(actions);
+      list.appendChild(card);
+    });
+
+  if (!list.children.length) list.innerHTML = "<p>No work projects found.</p>";
+}
+
+document.getElementById("saveProjectBtn").addEventListener("click", () => {
+  const unit = document.getElementById("projectUnit").value.trim();
+  const jobs = selectedProjectJobs();
+  const otherRepair = document.getElementById("projectOtherRepair").value.trim();
+  if (!unit) { alert("Please enter a Unit #."); return; }
+  if (!jobs.length && !otherRepair) { alert("Select a repair or enter Other Repair."); return; }
+
+  const rec = {
+    id: document.getElementById("projectId").value || String(Date.now()),
+    unit,
+    equipment: document.getElementById("projectEquipment").value,
+    mechanic: document.getElementById("projectMechanic").value.trim(),
+    dateStarted: document.getElementById("projectDateStarted").value,
+    priority: document.getElementById("projectPriority").value,
+    status: document.getElementById("projectStatus").value,
+    jobs,
+    otherRepair,
+    tireAxle: document.getElementById("projectTireAxle").value.trim(),
+    parts: document.getElementById("projectParts").value,
+    notes: document.getElementById("projectNotes").value,
+    completedDate: document.getElementById("projectCompletedDate").value,
+    updatedAt: new Date().toISOString()
+  };
+
+  const projects = getProjects();
+  const i = projects.findIndex(p => p.id === rec.id);
+  if (i >= 0) projects[i] = rec; else projects.push(rec);
+  setProjects(projects);
+  document.getElementById("projectFormStatus").textContent = "Project saved.";
+  renderProjects(document.getElementById("projectSearch").value);
+  clearProjectForm();
+});
+
+
+async function makeProjectPdf(data) {
+  if (!window.jspdf?.jsPDF) throw new Error("PDF library did not load.");
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF();
+  let y = 18;
+
+  try {
+    const img = await fetch("dnl-logo.png").then(r => r.blob()).then(blob => new Promise(resolve => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.readAsDataURL(blob);
+    }));
+    pdf.addImage(img, "PNG", 18, y, 174, 62);
+    y += 68;
+  } catch {}
+
+  pdf.setFontSize(16);
+  pdf.setFont("helvetica","bold");
+  pdf.text("Completed Work Project",18,y); y += 9;
+  pdf.setFontSize(11);
+  pdf.setFont("helvetica","normal");
+
+  const jobs = [...(data.jobs || [])];
+  if (data.otherRepair) jobs.push(data.otherRepair);
+
+  const fields = [
+    `Unit #: ${data.unit || "-"}`,
+    `Equipment: ${data.equipment || "-"}`,
+    `Mechanic: ${data.mechanic || "-"}`,
+    `Date Started: ${data.dateStarted || "-"}`,
+    `Completion Date: ${data.completedDate || "-"}`,
+    `Priority: ${data.priority || "-"}`,
+    `Status: ${data.status || "-"}`
+  ];
+  fields.forEach(t => { pdf.text(t,18,y); y += 6; });
+
+  y += 4;
+  pdf.setFont("helvetica","bold"); pdf.text("WORK COMPLETED",18,y); y += 7;
+  pdf.setFont("helvetica","normal");
+  const work = pdf.splitTextToSize(jobs.join(", ") || "Not specified",174);
+  pdf.text(work,18,y); y += work.length*5.5 + 4;
+
+  if (data.tireAxle) {
+    pdf.setFont("helvetica","bold"); pdf.text("TIRE / AXLE WORKED ON",18,y); y += 7;
+    pdf.setFont("helvetica","normal");
+    const tireAxle = pdf.splitTextToSize(data.tireAxle,174);
+    pdf.text(tireAxle,18,y); y += tireAxle.length*5.5 + 4;
+  }
+
+  pdf.setFont("helvetica","bold"); pdf.text("PARTS",18,y); y += 7;
+  pdf.setFont("helvetica","normal");
+  const parts = pdf.splitTextToSize(data.parts || "None recorded.",174);
+  pdf.text(parts,18,y); y += parts.length*5.5 + 4;
+
+  pdf.setFont("helvetica","bold"); pdf.text("WORK NOTES",18,y); y += 7;
+  pdf.setFont("helvetica","normal");
+  const notes = pdf.splitTextToSize(data.notes || "None recorded.",174);
+  pdf.text(notes,18,y);
+
+  const filename = `DNL_Completed_Work_Unit_${data.unit||"Unknown"}_${data.completedDate||"NoDate"}.pdf`;
+  return new File([pdf.output("blob")], filename, {type:"application/pdf"});
+}
+
+document.getElementById("shareProjectBtn").addEventListener("click", async () => {
+  try {
+    const unit = document.getElementById("projectUnit").value.trim();
+    const status = document.getElementById("projectStatus").value;
+    if (!unit) { alert("Please enter a Unit #."); return; }
+    if (status !== "Completed") {
+      alert("Mark the project Completed before sending it to the bookkeeper.");
+      return;
+    }
+    const data = {
+      unit,
+      equipment: document.getElementById("projectEquipment").value,
+      mechanic: document.getElementById("projectMechanic").value.trim(),
+      dateStarted: document.getElementById("projectDateStarted").value,
+      priority: document.getElementById("projectPriority").value,
+      status,
+      jobs: selectedProjectJobs(),
+      otherRepair: document.getElementById("projectOtherRepair").value.trim(),
+      tireAxle: document.getElementById("projectTireAxle").value.trim(),
+      parts: document.getElementById("projectParts").value,
+      notes: document.getElementById("projectNotes").value,
+      completedDate: document.getElementById("projectCompletedDate").value
+    };
+    const file = await makeProjectPdf(data);
+    await sharePdfFile(
+      file,
+      `D&L Completed Work - Unit ${unit}`,
+      `Completed work record for Unit ${unit}. Attached for file storage.`
+    );
+    document.getElementById("projectFormStatus").textContent = "Completed work PDF ready to send to bookkeeper.";
+  } catch (e) {
+    if (e?.name !== "AbortError") alert(e?.message || "Could not create completed work PDF.");
+  }
+});
+
+document.getElementById("newProjectBtn").addEventListener("click", clearProjectForm);
+document.getElementById("projectSearch").addEventListener("input", e => renderProjects(e.target.value));
+
+const APP_VERSION = "24";
 
 const sections = {
   "ENGINE & FLUIDS": [
@@ -199,6 +905,12 @@ function buildChecklist() {
         radio.addEventListener("change", () => {
           savedSelections[item] = status;
           noteBox.hidden = !["FAIL", "FIXED"].includes(status);
+          if (!noteBox.hidden) {
+            setTimeout(() => {
+              noteBox.focus();
+              noteBox.scrollIntoView({ behavior: "smooth", block: "center" });
+            }, 50);
+          }
         });
 
         const text = document.createElement("span");
@@ -542,6 +1254,16 @@ async function buildPdfFile(data) {
   const pdf = new jsPDF();
   const state = { y: 20 };
 
+  try {
+    const logo = await fetch("dnl-logo.png").then(r => r.blob()).then(blob => new Promise(resolve => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.readAsDataURL(blob);
+    }));
+    pdf.addImage(logo, "PNG", 18, state.y, 174, 62);
+    state.y += 68;
+  } catch {}
+
   pdf.setFontSize(18);
   addPdfLine(pdf, state, "D&L Fluid Hauling Ltd.", { bold: true, extraGap: 1 });
   pdf.setFontSize(14);
@@ -643,16 +1365,65 @@ if (savedDraft) {
 
 /* Keep the app installable, but use a network-first service worker so updates
    don't get trapped behind stale cached JavaScript. */
+
+
+const todayV2 = new Date().toISOString().slice(0,10);
+document.getElementById("driverDate").value = todayV2;
+document.getElementById("projectDateStarted").value = todayV2;
+
+buildDriverChecklist();
+buildProjectJobOptions();
+renderProjects();
+
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", async () => {
     try {
-      const registration = await navigator.serviceWorker.register(
-        "service-worker.js?v=10",
+      const reg = await navigator.serviceWorker.register(
+        "service-worker.js?v=24",
         { updateViaCache: "none" }
       );
-      registration.update();
-    } catch (error) {
-      console.warn("Service worker registration failed:", error);
+      reg.update();
+    } catch (e) {
+      console.warn("Service worker registration failed:", e);
     }
   });
 }
+
+
+/* ---------------- PHONE DICTATION HELPERS ----------------
+   Uses the phone's built-in keyboard dictation instead of browser speech APIs.
+   Works with Android and iPhone/iPad keyboards.
+----------------------------------------------------------- */
+
+function addDictationHint(textarea) {
+  if (!(textarea instanceof HTMLTextAreaElement)) return;
+  if (textarea.dataset.dictationReady === "true") return;
+
+  textarea.dataset.dictationReady = "true";
+
+  const hint = document.createElement("div");
+  hint.className = "dictation-hint";
+  hint.textContent = "🎙️ Tap this box, then use your phone keyboard microphone to dictate.";
+  textarea.insertAdjacentElement("afterend", hint);
+}
+
+function installDictationHints(root = document) {
+  root.querySelectorAll("textarea").forEach(addDictationHint);
+}
+
+const dictationObserver = new MutationObserver(mutations => {
+  mutations.forEach(mutation => {
+    mutation.addedNodes.forEach(node => {
+      if (!(node instanceof Element)) return;
+      if (node.matches?.("textarea")) addDictationHint(node);
+      installDictationHints(node);
+    });
+  });
+});
+
+dictationObserver.observe(document.body, {
+  childList: true,
+  subtree: true
+});
+
+installDictationHints();
