@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 512 512">
+  <rect width="192" height="192" rx="96" fill="#111827"/>
+  <text x="256" y="235" text-anchor="middle" font-size="170"
+        font-family="Arial, sans-serif" font-weight="700" fill="white">D&amp;L</text>
+  <text x="256" y="330" text-anchor="middle" font-size="54"
+        font-family="Arial, sans-serif" fill="white">SERVICE</text>
+</svg>

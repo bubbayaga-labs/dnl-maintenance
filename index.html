@@ -6,11 +6,16 @@
   <meta name="theme-color" content="#111827" />
   <title>D&L Maintenance Checklist</title>
   <link rel="manifest" href="manifest.webmanifest" />
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css?v=10" />
 </head>
 <body>
   <header>
-    <img src="dnl-logo.png" alt="D&L Fluid Hauling Ltd. Logo" class="company-logo">
+    <img
+      src="dnl-logo.png"
+      alt="D&L Fluid Hauling Ltd. Logo"
+      class="company-logo"
+      onerror="this.style.display='none'"
+    />
     <h1>D&L Fluid Hauling Ltd.</h1>
     <p>Semi-Truck & Trailer Shop Service Checklist</p>
   </header>
@@ -53,38 +58,48 @@
       <label>Technician
         <input id="technician" type="text" />
       </label>
-<div class="button-row">
-  <button id="historyBtnTop" type="button" class="secondary">
-    View Service History
-  </button>
 
-  <button id="clearBtnTop" type="button" class="danger">
-    Clear Form
+      <div class="button-row top-actions">
+        <button id="historyBtnTop" type="button" class="secondary">
+          View Service History
+        </button>
+        <button id="clearBtnTop" type="button" class="danger">
+          Clear Form
+        </button>
       </div>
-<div id="historyPanel" style="display:none; margin-top:20px;">
-  <h2>Service History</h2>
 
-  <input
-    id="historySearch"
-    type="text"
-    placeholder="Search by Unit #"
-  />
-
-  <div id="historyList"></div>
-</div> </section>
+      <div id="historyPanel" class="history-panel" hidden>
+        <div class="history-heading-row">
+          <h2>Service History</h2>
+          <button id="closeHistoryBtn" type="button" class="secondary small-btn">Close</button>
+        </div>
+        <input
+          id="historySearch"
+          type="text"
+          placeholder="Search by Unit #"
+        />
+        <div id="historyList"></div>
+      </div>
+    </section>
 
     <section id="checklist"></section>
 
     <section class="card">
       <h2>Defects / Repairs Fixed</h2>
-      <textarea id="repairs" rows="8" placeholder="Enter defects found and repairs completed..."></textarea>
+      <textarea
+        id="repairs"
+        rows="8"
+        placeholder="Enter defects found and repairs completed..."
+      ></textarea>
     </section>
 
     <section class="card">
       <h2>Technician Signature</h2>
       <canvas id="signaturePad" width="800" height="260"></canvas>
       <div class="button-row">
-        <button id="clearSignature" type="button" class="secondary">Clear Signature</button>
+        <button id="clearSignature" type="button" class="secondary">
+          Clear Signature
+        </button>
       </div>
     </section>
 
@@ -96,21 +111,15 @@
 
       <div class="button-row">
         <button id="saveBtn" type="button">Save on Phone</button>
-<button id="completeBtn" type="button">
-  Complete Service
-</button>
-<button id="historyBtn" type="button" class="secondary">
-  View Service History
-</button>       
- <button id="printBtn" type="button" class="secondary">Print / Save PDF</button>
-        <button id="clearBtn" type="button" class="danger">Clear Form</button>
+        <button id="completeBtn" type="button">Complete Service</button>
+        <button id="printBtn" type="button" class="secondary">Share / Save PDF</button>
       </div>
-
 
       <p id="status"></p>
     </section>
   </main>
-<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
-<script src="app.js?v=4"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
+  <script src="app.js?v=10"></script>
 </body>
 </html>
