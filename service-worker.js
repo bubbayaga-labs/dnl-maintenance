@@ -1,4 +1,4 @@
-const CACHE_NAME = "dnl-maintenance-v2";
+const CACHE_NAME = "dnl-maintenance-v3";
 const ASSETS = [
   "./",
   "./index.html",
