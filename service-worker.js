@@ -1,4 +1,4 @@
-const CACHE_NAME = "dnl-maintenance-v24";
+const CACHE_NAME = "dnl-maintenance-v25";
 const CORE = [
   "./",
   "./index.html",
@@ -6,8 +6,8 @@ const CORE = [
   "./app.js?v=24",
   "./manifest.webmanifest",
   "./dnl-logo.png",
-  "./icon-192.svg",
-  "./icon-512.svg"
+  "./icon-192.png",
+  "./icon-512.png"
 ];
 
 self.addEventListener("install", event => {
