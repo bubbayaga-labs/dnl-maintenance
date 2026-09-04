@@ -1,0 +1,50 @@
+D&L MAINTENANCE APP - CLEAN FIXED BUILD
+
+This build replaces the older copy in the ZIP you uploaded.
+
+WHAT IS FIXED
+- Checklist sections start COLLAPSED.
+- Tap a section heading to open/close it.
+- View Service History and Clear Form are at the TOP.
+- Service History opens directly under the top buttons.
+- PASS / FAIL / FIXED / N/A are included.
+- FAIL and FIXED show a defect/repair note box.
+- Save on Phone saves a draft without creating duplicate history records.
+- Complete Service saves a final record to Service History, then clears the form.
+- Service History can search, open, and delete records.
+- Share / Save PDF creates a REAL PDF file and uses the phone share sheet when supported.
+- No about:blank report page.
+- Service worker uses NETWORK-FIRST updates and version 10 to prevent stale app.js from sticking on phones.
+- Old caches are deleted automatically when the new service worker activates.
+
+IMPORTANT ABOUT THE LOGO
+The older ZIP you uploaded did NOT contain dnl-logo.png.
+This build will automatically show dnl-logo.png if that file exists in the same folder.
+If the file is missing, the text header still works normally.
+
+TEST LOCALLY
+1. Open a terminal in this folder.
+2. Run:
+   python3 -m http.server 8020
+3. Open:
+   http://localhost:8020
+4. Hard refresh once: Ctrl+Shift+R
+
+GITHUB DEPLOYMENT
+The safest method is to replace the repository files with the files in this folder.
+Keep any existing dnl-logo.png file in GitHub if you want the company photo/logo to remain.
+
+Files to upload/replace:
+- index.html
+- app.js
+- styles.css
+- manifest.webmanifest
+- service-worker.js
+- icon-192.svg
+- icon-512.svg
+
+After GitHub Pages publishes:
+1. Open the normal GitHub Pages URL in Chrome on the phone.
+2. Refresh once.
+3. Check that the top buttons are present and all checklist sections start collapsed.
+4. Then install/add it to the home screen again.

@@ -1,0 +1,24 @@
+D&L Maintenance App V2.2.2 - Dictation Friendly
+
+This build keeps the known-good V2.2.2 app and adds phone-dictation helpers.
+
+HOW IT WORKS
+- No Whisper
+- No browser SpeechRecognition
+- No microphone API in the app
+- The user taps a text box and uses the microphone built into their phone keyboard.
+
+ANDROID
+- Samsung Keyboard / Gboard microphone dictation can type directly into the field.
+
+IPHONE / IPAD
+- Apple Dictation can type directly into the field.
+
+IMPROVEMENTS
+- Larger note boxes
+- A visible hint below writing areas:
+  "Tap this box, then use your phone keyboard microphone to dictate."
+- FAIL/FIXED note boxes automatically focus and scroll into view when they appear.
+- Works with existing PDF/save logic because the result is plain text in the same fields.
+
+The original V2.2.2 ZIP remains unchanged.

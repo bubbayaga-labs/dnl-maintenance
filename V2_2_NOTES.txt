@@ -1,0 +1,16 @@
+D&L Maintenance App V2.2
+
+Driver changes:
+- Truck Unit #
+- Truck Fuel Status: Fueled / Empty
+- Optional Trailer Attached toggle
+- Trailer Unit # and Trailer Type
+- Trailer checklist:
+  lights, tires/wheels/lugs, brakes, air lines/glad hands,
+  suspension/air bags, coupling, frame/damage, hubs, mud flaps
+- Positive Air Shutdown Test added
+- H2S Monitor section:
+  Monitor ID / Serial #
+  Bump Test PASS / FAIL
+  Calibration PASS / FAIL
+- Driver PDF includes all truck, trailer and H2S details
