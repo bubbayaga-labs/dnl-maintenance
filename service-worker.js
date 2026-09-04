@@ -1,11 +1,11 @@
-const CACHE_NAME = "dnl-maintenance-v25";
+const CACHE_NAME = "byl-maintenance-v26";
 const CORE = [
   "./",
   "./index.html",
   "./styles.css?v=24",
   "./app.js?v=24",
   "./manifest.webmanifest",
-  "./dnl-logo.png",
+  "./byl-logo.png",
   "./icon-192.png",
   "./icon-512.png"
 ];
